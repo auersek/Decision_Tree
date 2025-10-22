@@ -51,7 +51,7 @@ def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
 # --- Main execution ---
 
 if __name__ == '__main__':
-    
+
     # --- Step 1: Load Data ---
     clean_data = load_data_from_file("WIFI_db/clean_dataset.txt")
     noisy_data = load_data_from_file("WIFI_db/noisy_dataset.txt")
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     visualize_tree(clean_tree, clean_depth, "decision_tree_visualization.png")
 
     # --- Step 3 (Report): Evaluation ---
-    
+
     # Run 10-fold CV on Clean Dataset
     metrics_clean = cross_validation(clean_data, k=10)
     print_metrics(*metrics_clean, title="10-Fold CV Metrics: Clean Dataset")
