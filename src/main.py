@@ -1,10 +1,7 @@
 import numpy as np
-import matplotlib
-import pandas as pd
-from collections import Counter
-from typing import List, Tuple, Dict, Any
-from load import load_data_from_file
-from split import entropy, find_split
+from visual import visualize_tree
+from train import decision_tree_learning
+from evaluate import cross_validation
 
 NUM_SIGNALS = 7
 
@@ -53,8 +50,8 @@ def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
 if __name__ == '__main__':
     
     # --- Step 1: Load Data ---
-    clean_data = load_data_from_file("WIFI_db/clean_dataset.txt")
-    noisy_data = load_data_from_file("WIFI_db/noisy_dataset.txt")
+    clean_data = load_data_from_file("src/For_60012/wifi_db/clean_dataset.txt")
+    noisy_data = load_data_from_file("src/For_60012/wifi_db/noisy_dataset.txt")
     print("Data loaded successfully.")
 
     # --- Step 2 (Report): Train on full clean dataset for visualization ---

@@ -1,5 +1,6 @@
 from collections import Counter
 import numpy as np
+from typing import Dict, Any, Tuple
 
 def entropy(labels: np.ndarray) -> float:
     """
@@ -98,7 +99,7 @@ def majority_label(labels: np.ndarray) -> float:
     # Counter works perfectly on NumPy arrays
     return Counter(labels).most_common(1)[0][0]
 
-def decision_tree_learning(train_dataset: np.ndarray, depth: int) -> Tuple[Dict[str, Any], int]:
+def decision_tree_learning(train_data: np.ndarray, depth: int) -> Tuple[Dict[str, Any], int]:
     """
     Recursively builds a decision tree as per the coursework pseudo-code.
     
@@ -109,18 +110,18 @@ def decision_tree_learning(train_dataset: np.ndarray, depth: int) -> Tuple[Dict[
     """
     
     # 1. Check if all samples have the same label (Base Case)
-    if all_same_label(train_dataset):
+    if all_same_label(train_data):
         # Handle empty dataset by returning a default label (e.g., 1)
-        label = train_dataset[0, -1] if len(train_dataset) > 0 else 1
+        label = train_data[0, -1] if len(train_data) > 0 else 1
         return {"type": "leaf", "label": label}, depth
     
     # 2. Find the best split
-    attr, thr = find_split(train_dataset)
+    attr, thr = find_split(train_data)
     
     # 3. No valid split found (e.g., no info gain, or all features identical)
     # This is an implied base case to prevent infinite loops.
     if attr == -1:
-        labels = train_dataset[:, -1]
+        labels = train_data[:, -1]
         return {"type": "leaf", "label": majority_label(labels)}, depth
 
     # 4. Create a new node
@@ -131,13 +132,13 @@ def decision_tree_learning(train_dataset: np.ndarray, depth: int) -> Tuple[Dict[
     }
     
     # 5. Split training dataset
-    l_dataset = dataset[dataset[:, attr] <= thr]
-    r_dataset = dataset[dataset[:, attr] > thr]
+    l_dataset = train_data[train_data[:, attr] <= thr]
+    r_dataset = train_data[train_data[:, attr] > thr]
     
     # 6. Handle edge case: if a split results in an empty child
     # This can happen if all feature values are identical but labels differ
     if len(l_dataset) == 0 or len(r_dataset) == 0:
-        labels = train_dataset[:, -1]
+        labels = train_data[:, -1]
         return {"type": "leaf", "label": majority_label(labels)}, depth
         
     # 7. Recursive calls
