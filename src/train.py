@@ -10,7 +10,6 @@ def entropy(labels: np.ndarray) -> float:
     if n == 0:
         return 0.0
     
-    # np.unique(..., return_counts=True) is the NumPy equivalent of Counter
     _, counts = np.unique(labels, return_counts=True)
     probabilities = counts / n
     
@@ -25,12 +24,10 @@ def find_split(dataset: np.ndarray) -> Tuple[int, float]:
         Returns (-1, float("nan")) if no valid split is found.
     """
     n_samples, n_features_total = dataset.shape
-    # Last column is label, so 7 features (0-6)
     n_features = n_features_total - 1 
     
     labels = dataset[:, -1]
     
-    # Base case: cannot split if all labels are the same or not enough samples
     if len(np.unique(labels)) == 1:
         return -1, float("nan")
 
@@ -40,15 +37,11 @@ def find_split(dataset: np.ndarray) -> Tuple[int, float]:
     best_thr = float("nan")
 
     for j in range(n_features):
-        # Sort data by the current feature
-        # Using argsort is efficient as it just gives indices
         sorted_indices = np.argsort(dataset[:, j])
         feature_col = dataset[sorted_indices, j]
         sorted_labels = labels[sorted_indices]
 
-        # Iterate through possible split points
         for k in range(n_samples - 1):
-            # Only consider splits between different values
             if feature_col[k] == feature_col[k+1]:
                 continue
             
@@ -60,9 +53,8 @@ def find_split(dataset: np.ndarray) -> Tuple[int, float]:
             right_labels = sorted_labels[k+1:]
 
             # Calculate remainder (weighted average of children entropy)
-            nL, nR = len(left_labels), len(right_labels)
-            remainder = (nL / n_samples) * entropy(left_labels) + \
-                          (nR / n_samples) * entropy(right_labels)
+            remainder = (len(left_labels) / n_samples) * entropy(left_labels) + \
+                          (len(right_labels) / n_samples) * entropy(right_labels)
             
             # Calculate information gain
             gain = parent_entropy - remainder
