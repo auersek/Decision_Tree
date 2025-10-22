@@ -1,16 +1,14 @@
+import argparse
 import numpy as np
 from visual import visualize_tree
 from train import decision_tree_learning
 from evaluate import cross_validation, calculate_metrics
 
-NUM_SIGNALS = 7
-
 def load_data_from_file(file_name: str) -> np.ndarray:
     try:
         return np.loadtxt(file_name)
     except IOError as e:
-        print(f"Error loading file {file_name}: {e}")
-        print("Please ensure 'WIFI_db/clean_dataset.txt' and 'WIFI_db/noisy_dataset.txt' exist.")
+        print(f"src/wifi_db/{file_name} does not exist or is inaccessible: {e}")
         exit(1)
 
 def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
@@ -39,9 +37,18 @@ def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
         print(f"Room {int(label):<9} | {precision[i]:<10.3f} | {recall[i]:<10.3f} | {f1[i]:<10.3f}")
 
 if __name__ == '__main__':
-    clean_data = load_data_from_file("src/For_60012/wifi_db/clean_dataset.txt")
-    noisy_data = load_data_from_file("src/For_60012/wifi_db/noisy_dataset.txt")
+    parser = argparse.ArgumentParser(
+        description="Configuration to run the file"
+    )
+    parser.add_argument(
+        "--file-name",
+        type=str,
+        default="src/For_60012/wifi_db/noisy_dataset.txt",
+        help="Read data from existing txt file",
+    )
+    args = parser.parse_args()
 
+    clean_data = load_data_from_file("src/For_60012/wifi_db/clean_dataset.txt")
     clean_tree, clean_depth = decision_tree_learning(clean_data, 0)
     
     visualize_tree(clean_tree, clean_depth, "decision_tree_visualization.png")
@@ -50,9 +57,10 @@ if __name__ == '__main__':
     accuracy, precision, recall, f1 = calculate_metrics(conf_matrix_clean)
     print_metrics(conf_matrix_clean, accuracy, precision, recall, f1, labels, title="10-Fold CV Metrics: Clean Dataset")
 
-    conf_matrix_noisy, labels = cross_validation(noisy_data, k=10)
+    test_data = load_data_from_file(args.file_name)
+    conf_matrix_noisy, labels = cross_validation(test_data, k=10)
     accuracy, precision, recall, f1 = calculate_metrics(conf_matrix_noisy)
-    print_metrics(conf_matrix_noisy, accuracy, precision, recall, f1, labels, title="10-Fold CV Metrics: Noisy Dataset")
+    print_metrics(conf_matrix_noisy, accuracy, precision, recall, f1, labels, title=f"10-Fold CV Metrics: {args.file_name}")
 
 
 
