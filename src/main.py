@@ -1,14 +1,11 @@
 import numpy as np
 from visual import visualize_tree
 from train import decision_tree_learning
-from evaluate import cross_validation
+from evaluate import cross_validation, calculate_metrics
 
 NUM_SIGNALS = 7
 
 def load_data_from_file(file_name: str) -> np.ndarray:
-    """
-    Loads the dataset from a file.
-    """
     try:
         return np.loadtxt(file_name)
     except IOError as e:
@@ -17,11 +14,9 @@ def load_data_from_file(file_name: str) -> np.ndarray:
         exit(1)
 
 def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
-    """Helper function to print all metrics in a formatted way."""
     
     print(f"\n===== {title} =====")
     
-    # --- Confusion Matrix ---
     print("\n## Confusion Matrix")
     header = "True \\ Pred |"
     for label in labels:
@@ -34,43 +29,30 @@ def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
             row_str += f" {val:<7} |"
         print(row_str)
 
-    # --- Overall Accuracy ---
     print("\n## Overall Accuracy")
     print(f"{accuracy * 100:.2f}%")
 
-    # --- Per-Class Metrics ---
     print("\n## Per-Class Metrics")
     print(f"{'Class (Room)':<12} | {'Precision':<10} | {'Recall':<10} | {'F1-Score':<10}")
     print("-" * 57)
     for i, label in enumerate(labels):
         print(f"Room {int(label):<9} | {precision[i]:<10.3f} | {recall[i]:<10.3f} | {f1[i]:<10.3f}")
 
-# --- Main execution ---
-
 if __name__ == '__main__':
-    
-    # --- Step 1: Load Data ---
     clean_data = load_data_from_file("src/For_60012/wifi_db/clean_dataset.txt")
     noisy_data = load_data_from_file("src/For_60012/wifi_db/noisy_dataset.txt")
-    print("Data loaded successfully.")
 
-    # --- Step 2 (Report): Train on full clean dataset for visualization ---
-    print("\nTraining tree on full clean dataset for visualization...")
     clean_tree, clean_depth = decision_tree_learning(clean_data, 0)
-    print(f"Tree trained. Max depth: {clean_depth}")
     
-    # Generate and save the plot
     visualize_tree(clean_tree, clean_depth, "decision_tree_visualization.png")
 
-    # --- Step 3 (Report): Evaluation ---
-    
-    # Run 10-fold CV on Clean Dataset
-    metrics_clean = cross_validation(clean_data, k=10)
-    print_metrics(*metrics_clean, title="10-Fold CV Metrics: Clean Dataset")
-    
-    # Run 10-fold CV on Noisy Dataset
-    metrics_noisy = cross_validation(noisy_data, k=10)
-    print_metrics(*metrics_noisy, title="10-Fold CV Metrics: Noisy Dataset")
+    conf_matrix_clean, labels = cross_validation(clean_data, k=10)
+    accuracy, precision, recall, f1 = calculate_metrics(conf_matrix_clean)
+    print_metrics(conf_matrix_clean, accuracy, precision, recall, f1, labels, title="10-Fold CV Metrics: Clean Dataset")
+
+    conf_matrix_noisy, labels = cross_validation(noisy_data, k=10)
+    accuracy, precision, recall, f1 = calculate_metrics(conf_matrix_noisy)
+    print_metrics(conf_matrix_noisy, accuracy, precision, recall, f1, labels, title="10-Fold CV Metrics: Noisy Dataset")
 
 
 
