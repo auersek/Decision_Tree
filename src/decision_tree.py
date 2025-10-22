@@ -1,8 +1,10 @@
-import numpy as np
-import matplotlib
+# import numpy as np
+# import matplotlib
 
 
-def load_data_from_file():
+def load_data_from_file(file_name):
+    file = open(file_name)
+    print(file.read())
     return 0
 
 
@@ -17,7 +19,7 @@ def evaluate(test_db, trained_tree):
 
 if __name__ == '__main__':
 
-    decision_tree_learning()
+    load_data_from_file("/Users/aurelersek/Desktop/Decision_Trees/src/For_60012/wifi_db/clean_dataset.txt")
 
 
 
