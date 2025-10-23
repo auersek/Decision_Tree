@@ -43,12 +43,12 @@ if __name__ == '__main__':
     parser.add_argument(
         "--file-name",
         type=str,
-        default="src/For_60012/wifi_db/noisy_dataset.txt",
+        default="src/wifi_db/noisy_dataset.txt",
         help="Read data from existing txt file",
     )
     args = parser.parse_args()
 
-    clean_data = load_data_from_file("src/For_60012/wifi_db/clean_dataset.txt")
+    clean_data = load_data_from_file("src/wifi_db/clean_dataset.txt")
     clean_tree, clean_depth = decision_tree_learning(clean_data, 0)
     
     visualize_tree(clean_tree, clean_depth, "decision_tree_visualization.png")
