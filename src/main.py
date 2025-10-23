@@ -11,11 +11,16 @@ def load_data_from_file(file_name: str) -> np.ndarray:
         print(f"src/wifi_db/{file_name} does not exist or is inaccessible: {e}")
         exit(1)
 
+def train_test_split(data, test_ratio=0.2):
+    np.random.shuffle(data)
+    split_index = int(len(data) * (1 - test_ratio))
+    return data[:split_index], data[split_index:]
+
 def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
     
-    print(f"\n===== {title} =====")
+    print(f"\n{title}")
     
-    print("\n## Confusion Matrix")
+    print("\nConfusion Matrix")
     header = "True \\ Pred |"
     for label in labels:
         header += f" Room {int(label)} |"
@@ -27,10 +32,10 @@ def print_metrics(conf_matrix, accuracy, precision, recall, f1, labels, title):
             row_str += f" {val:<7} |"
         print(row_str)
 
-    print("\n## Overall Accuracy")
+    print("\nOverall Accuracy")
     print(f"{accuracy * 100:.2f}%")
 
-    print("\n## Per-Class Metrics")
+    print("\nPer-Class Metrics")
     print(f"{'Class (Room)':<12} | {'Precision':<10} | {'Recall':<10} | {'F1-Score':<10}")
     print("-" * 57)
     for i, label in enumerate(labels):
@@ -50,17 +55,16 @@ if __name__ == '__main__':
 
     clean_data = load_data_from_file("src/wifi_db/clean_dataset.txt")
     clean_tree, clean_depth = decision_tree_learning(clean_data, 0)
-    
     visualize_tree(clean_tree, clean_depth, "decision_tree_visualization.png")
 
     conf_matrix_clean, labels = cross_validation(clean_data, k=10)
     accuracy, precision, recall, f1 = calculate_metrics(conf_matrix_clean)
     print_metrics(conf_matrix_clean, accuracy, precision, recall, f1, labels, title="10-Fold CV Metrics: Clean Dataset")
 
-    test_data = load_data_from_file(args.file_name)
-    conf_matrix_noisy, labels = cross_validation(test_data, k=10)
-    accuracy, precision, recall, f1 = calculate_metrics(conf_matrix_noisy)
-    print_metrics(conf_matrix_noisy, accuracy, precision, recall, f1, labels, title=f"10-Fold CV Metrics: {args.file_name}")
+    input_test_data = load_data_from_file(args.file_name)
+    conf_matrix_input, labels = cross_validation(input_test_data, k=10)
+    accuracy, precision, recall, f1 = calculate_metrics(conf_matrix_input)
+    print_metrics(conf_matrix_input, accuracy, precision, recall, f1, labels, title=f"10-Fold CV Metrics: {args.file_name}")
 
 
 

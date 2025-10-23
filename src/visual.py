@@ -71,11 +71,11 @@ def visualize_tree(tree: Dict[str, Any], depth: int, filename: str = "decision_t
     
     draw_tree(tree, ax)
     
-    plt.title("Decision Tree Visualization (Clean Dataset)", fontsize=16)
+    plt.title("Decision Tree Visualization (Clean Dataset)", fontsize=30)
     
     # Add key/legend for lines
     green_line = mlines.Line2D([], [], color='green', label='True (<=)')
     red_line = mlines.Line2D([], [], color='red', label='False (>)')
-    ax.legend(handles=[green_line, red_line], loc='lower right', fontsize=12)
+    ax.legend(handles=[green_line, red_line], loc='lower right', fontsize=30)
     
     plt.savefig(filename, bbox_inches='tight', dpi=250)
